@@ -1,0 +1,8 @@
+{
+  "name": "GYE TV+ | Noticias de Guayaquil y Ecuador",
+  "description": "GYE TV+ - Canal digital de noticias, actualidad, deportes, entretenimiento y cultura de Guayaquil y Ecuador.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
