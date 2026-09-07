@@ -61,8 +61,10 @@ export interface LiveStreamConfig {
   currentShow: string;
   presenter: string;
   viewersCount: number;
-  streamSource: 'youtube' | 'custom' | 'demo';
+  streamSource: 'youtube' | 'dailymotion' | 'image' | 'custom' | 'demo';
   youtubeEmbedId: string;
+  dailymotionEmbedId?: string;
+  customImageUrl?: string;
   customStreamUrl?: string;
   schedule: LiveScheduleItem[];
 }

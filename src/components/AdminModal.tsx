@@ -130,6 +130,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, initial
     presenter: liveConfig.presenter,
     streamSource: liveConfig.streamSource,
     youtubeEmbedId: liveConfig.youtubeEmbedId,
+    dailymotionEmbedId: liveConfig.dailymotionEmbedId || '',
+    customImageUrl: liveConfig.customImageUrl || PRESET_IMAGES[0].url,
     customStreamUrl: liveConfig.customStreamUrl || '',
     viewersCount: liveConfig.viewersCount,
     isLive: liveConfig.isLive
@@ -145,6 +147,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, initial
       presenter: liveConfig.presenter,
       streamSource: liveConfig.streamSource,
       youtubeEmbedId: liveConfig.youtubeEmbedId,
+      dailymotionEmbedId: liveConfig.dailymotionEmbedId || '',
+      customImageUrl: liveConfig.customImageUrl || PRESET_IMAGES[0].url,
       customStreamUrl: liveConfig.customStreamUrl || '',
       viewersCount: liveConfig.viewersCount,
       isLive: liveConfig.isLive
@@ -173,6 +177,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, initial
       presenter: liveForm.presenter,
       streamSource: liveForm.streamSource,
       youtubeEmbedId: liveForm.youtubeEmbedId,
+      dailymotionEmbedId: liveForm.dailymotionEmbedId,
+      customImageUrl: liveForm.customImageUrl,
       customStreamUrl: liveForm.customStreamUrl,
       viewersCount: Number(liveForm.viewersCount) || 4800,
       isLive: liveForm.isLive

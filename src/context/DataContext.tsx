@@ -87,7 +87,7 @@ interface DataContextType {
   // Live Stream Actions
   updateLiveConfig: (updates: Partial<LiveStreamConfig>) => void;
   setLiveStreamActive: (isLive: boolean) => void;
-  setLiveStreamSource: (source: 'youtube' | 'custom' | 'demo', embedIdOrUrl: string) => void;
+  setLiveStreamSource: (source: 'youtube' | 'dailymotion' | 'image' | 'custom' | 'demo', embedIdOrUrl: string) => void;
 
   // Real-time Live Chat
   sendLiveChatMessage: (text: string, customAuthor?: string) => void;
@@ -456,12 +456,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     saveLive(updated);
   };
 
-  const setLiveStreamSource = (source: 'youtube' | 'custom' | 'demo', embedIdOrUrl: string) => {
+  const setLiveStreamSource = (source: 'youtube' | 'dailymotion' | 'image' | 'custom' | 'demo', embedIdOrUrl: string) => {
     let cleanId = embedIdOrUrl.trim();
     if (source === 'youtube') {
       const ytMatch = cleanId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
       if (ytMatch && ytMatch[1]) {
         cleanId = ytMatch[1];
+      }
+    } else if (source === 'dailymotion') {
+      const dmMatch = cleanId.match(/(?:dailymotion\.com\/video\/|dai\.ly\/)([a-zA-Z0-9]+)/);
+      if (dmMatch && dmMatch[1]) {
+        cleanId = dmMatch[1];
       }
     }
 
@@ -469,6 +474,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...liveConfig,
       streamSource: source,
       youtubeEmbedId: source === 'youtube' ? cleanId : liveConfig.youtubeEmbedId,
+      dailymotionEmbedId: source === 'dailymotion' ? cleanId : liveConfig.dailymotionEmbedId,
+      customImageUrl: source === 'image' ? cleanId : liveConfig.customImageUrl,
       customStreamUrl: source === 'custom' ? cleanId : liveConfig.customStreamUrl
     };
     saveLive(updated);

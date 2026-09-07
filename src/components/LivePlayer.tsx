@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { extractYouTubeId, extractDailymotionId } from '../utils/streamHelpers';
 import { 
   Play, 
   Pause, 
@@ -258,12 +259,52 @@ export const LivePlayer: React.FC<LivePlayerProps> = ({ onOpenWebmasterGuide, on
                   </div>
                 ) : liveConfig.streamSource === 'youtube' ? (
                   <iframe
-                    src={`https://www.youtube.com/embed/${liveConfig.youtubeEmbedId}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1`}
-                    title="GYE TV+ Transmisión Oficial"
+                    src={`https://www.youtube.com/embed/${extractYouTubeId(liveConfig.youtubeEmbedId)}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1`}
+                    title="GYE TV+ Transmisión Oficial YouTube"
                     className="w-full h-full border-0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                   />
+                ) : liveConfig.streamSource === 'dailymotion' ? (
+                  <iframe
+                    src={`https://www.dailymotion.com/embed/video/${extractDailymotionId(liveConfig.dailymotionEmbedId || '')}?autoplay=1&mute=${isMuted ? 1 : 0}`}
+                    title="GYE TV+ Transmisión Oficial Dailymotion"
+                    className="w-full h-full border-0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : liveConfig.streamSource === 'image' ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={liveConfig.customImageUrl || 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=1400&q=85'}
+                      alt="GYE TV+ En Vivo Imagen"
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050811] via-black/40 to-transparent"></div>
+                    <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/90 px-3 py-1 border border-purple-500/50 shadow-[0_0_12px_rgba(192,132,252,0.4)]">
+                      <Tv className="w-4 h-4 text-purple-400" />
+                      <span className="font-cyber font-extrabold text-xs tracking-wider text-white">
+                        FOTO <span className="text-purple-400">EN DIRECTO</span>
+                      </span>
+                    </div>
+                    <div className="absolute bottom-12 left-4 right-4 z-10 hidden sm:flex flex-col">
+                      <div className="inline-flex items-center gap-1.5 self-start px-3 py-0.5 bg-purple-600 text-white font-mono font-extrabold text-[10px] uppercase tracking-wider shadow-[0_0_10px_rgba(192,132,252,0.6)]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                        <span>TRANSMISIÓN ESPECIAL EN FOTO • GYE TV+</span>
+                      </div>
+                      <div className="p-3 bg-black/90 border-l-4 border-purple-400 border-y border-r border-purple-500/30 text-white shadow-[0_0_20px_rgba(192,132,252,0.2)] flex items-center justify-between">
+                        <div>
+                          <p className="text-[10px] font-mono font-bold text-purple-300 uppercase tracking-widest">
+                            {liveConfig.currentShow}
+                          </p>
+                          <p className="font-headline text-base font-extrabold text-white">
+                            {liveConfig.title}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ) : liveConfig.streamSource === 'custom' && liveConfig.customStreamUrl ? (
                   <video
                     src={liveConfig.customStreamUrl}

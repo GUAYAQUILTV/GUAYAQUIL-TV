@@ -19,10 +19,18 @@ import { NewsModal } from './components/NewsModal';
 import { SearchModal } from './components/SearchModal';
 import { ContactModal } from './components/ContactModal';
 import { WebmasterGuideModal } from './components/WebmasterGuideModal';
+
+// New Restructured Views (10-point specifications)
+import { ProgramScheduleView } from './components/ProgramScheduleView';
+import { ShowsCatalogView } from './components/ShowsCatalogView';
+import { NewsCatalogView } from './components/NewsCatalogView';
+import { VideoLibraryView } from './components/VideoLibraryView';
+import { BottomNavBar } from './components/BottomNavBar';
 import { NewsItem, CategoryType } from './types';
 
 function AppContent() {
   const { newsList, adBanners } = useData();
+  const [currentTab, setCurrentTab] = useState<'inicio' | 'programacion' | 'programas' | 'noticias' | 'videos'>('inicio');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('Todas');
   const [activeNewsModal, setActiveNewsModal] = useState<NewsItem | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -38,24 +46,26 @@ function AppContent() {
     setIsAdminOpen(true);
   };
 
-  // Top featured and urgent news items (computed dynamically from live synchronized state)
   const heroFeaturedNews = newsList.find(n => n.isFeatured) || newsList[0];
   const urgentFeaturedNews = newsList.find(n => n.isUrgent && n.id !== heroFeaturedNews?.id) || newsList[1] || newsList[0];
 
   const handleOpenLive = () => {
-    const liveElem = document.getElementById('en-vivo');
-    if (liveElem) {
-      liveElem.scrollIntoView({ behavior: 'smooth' });
-    }
+    setCurrentTab('inicio');
+    setTimeout(() => {
+      const liveElem = document.getElementById('en-vivo');
+      if (liveElem) {
+        liveElem.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   return (
-    <div className="min-h-screen bg-[#050811] text-slate-100 flex flex-col selection:bg-[#00f0ff] selection:text-black font-sans relative">
+    <div className="min-h-screen bg-[#050811] text-slate-100 flex flex-col selection:bg-[#00f0ff] selection:text-black font-sans relative pb-16 lg:pb-0">
       
-      {/* Admin Fast Actions Sticky Bar (Only visible when logged in as Admin) */}
+      {/* Admin Fast Actions Sticky Bar */}
       <AdminBar onOpenAdmin={handleOpenAdmin} />
 
-      {/* 1. Breaking News Ticker (Cintillo de Última Hora - Real-time synchronized) */}
+      {/* 1. Breaking News Ticker (Cintillo de Última Hora) */}
       <BreakingTicker
         news={newsList}
         onSelectNews={(item) => setActiveNewsModal(item)}
@@ -64,91 +74,164 @@ function AppContent() {
       {/* 2. Main Header / Navigation */}
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}
-        onSelectCategory={(cat) => setSelectedCategory(cat)}
+        onSelectCategory={(cat) => {
+          setSelectedCategory(cat);
+          setCurrentTab('noticias');
+        }}
         selectedCategory={selectedCategory}
         onOpenWebmasterGuide={() => setIsWebmasterGuideOpen(true)}
         onOpenContactModal={() => setIsContactOpen(true)}
         onOpenAdmin={handleOpenAdmin}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1">
-        
-        {/* 3. Hero Section (Portada Principal Guayaquil) */}
-        {heroFeaturedNews && (
-          <Hero
-            featuredNews={heroFeaturedNews}
-            onSelectNews={(news) => setActiveNewsModal(news)}
-            onOpenLive={handleOpenLive}
-          />
-        )}
-
-        {/* 4. Noticia Destacada / Urgente */}
-        {urgentFeaturedNews && (
-          <UrgentFeatured
-            news={urgentFeaturedNews}
-            onSelectNews={(news) => setActiveNewsModal(news)}
-          />
-        )}
-
-        {/* Publicidad Banner Leaderboard Superior */}
-        {adBanners.headerLeaderboard && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <AdBanner
-              config={adBanners.headerLeaderboard}
-              onOpenContact={() => setIsContactOpen(true)}
-            />
+      {/* Secondary App Navigation Tabs Bar */}
+      <div className="bg-[#040711] border-b border-cyan-500/20 hidden lg:block sticky top-[95px] z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-2">
+          <div className="flex items-center gap-1">
+            {[
+              {id: 'inicio', label: '🏠 INICIO'},
+              {id: 'envivo', label: '🔴 EN VIVO', isLive: true},
+              {id: 'programacion', label: '📺 PROGRAMACIÓN'},
+              {id: 'programas', label: '🎬 PROGRAMAS'},
+              {id: 'noticias', label: '📰 NOTICIAS'},
+              {id: 'videos', label: '🎥 VIDEOS'},
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  if (tab.id === 'envivo') {
+                    handleOpenLive();
+                  } else {
+                    setCurrentTab(tab.id as any);
+                  }
+                }}
+                className={`px-3.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer border ${
+                  tab.id === 'envivo'
+                    ? 'bg-[#ff6600] text-black border-[#ff6600] shadow-[0_0_15px_rgba(255,102,0,0.6)] font-extrabold'
+                    : currentTab === tab.id
+                    ? 'bg-[#00f0ff] text-black border-[#00f0ff] shadow-[0_0_15px_rgba(0,240,255,0.6)]'
+                    : 'bg-transparent text-slate-200 hover:text-[#00f0ff] hover:bg-cyan-950/40 border-transparent hover:border-cyan-500/30'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
+
+          <div className="flex items-center gap-2 text-xs font-mono text-[#00f0ff]">
+            <span className="w-2 h-2 rounded-full bg-[#00f0ff] animate-ping"></span>
+            <span>GYE TV+ • PLATAFORMA DIGITAL INTEGRAL</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area based on Selected Tab */}
+      <main className="flex-1">
+        {currentTab === 'inicio' && (
+          <>
+            {/* Hero Section */}
+            {heroFeaturedNews && (
+              <Hero
+                featuredNews={heroFeaturedNews}
+                onSelectNews={(news) => setActiveNewsModal(news)}
+                onOpenLive={handleOpenLive}
+              />
+            )}
+
+            {/* Urgent News Featured */}
+            {urgentFeaturedNews && (
+              <UrgentFeatured
+                news={urgentFeaturedNews}
+                onSelectNews={(news) => setActiveNewsModal(news)}
+              />
+            )}
+
+            {/* Ad Banner Leaderboard */}
+            {adBanners.headerLeaderboard && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <AdBanner
+                  config={adBanners.headerLeaderboard}
+                  onOpenContact={() => setIsContactOpen(true)}
+                />
+              </div>
+            )}
+
+            {/* Recent News Grid */}
+            <NewsSection
+              newsList={newsList}
+              selectedCategory={selectedCategory}
+              onSelectCategory={(cat) => setSelectedCategory(cat)}
+              onSelectNews={(news) => setActiveNewsModal(news)}
+            />
+
+            {/* Live Player Section (🔴 EN VIVO) */}
+            <LivePlayer
+              onOpenWebmasterGuide={() => setIsWebmasterGuideOpen(true)}
+              onOpenAdmin={handleOpenAdmin}
+            />
+
+            {/* Categories */}
+            <CategorySection
+              onSelectCategory={(cat) => {
+                setSelectedCategory(cat);
+                setCurrentTab('noticias');
+              }}
+            />
+
+            {/* Sports */}
+            <SportsSection
+              newsList={newsList}
+              onSelectNews={(news) => setActiveNewsModal(news)}
+            />
+
+            {/* Entertainment */}
+            <EntertainmentSection
+              newsList={newsList}
+              onSelectNews={(news) => setActiveNewsModal(news)}
+            />
+
+            {/* Social & Newsletter */}
+            <SocialSection />
+            <NewsletterSection />
+          </>
         )}
 
-        {/* 5. Últimas Noticias Grid */}
-        <NewsSection
-          newsList={newsList}
-          selectedCategory={selectedCategory}
-          onSelectCategory={(cat) => setSelectedCategory(cat)}
-          onSelectNews={(news) => setActiveNewsModal(news)}
-        />
+        {currentTab === 'programacion' && (
+          <ProgramScheduleView onOpenLive={handleOpenLive} />
+        )}
 
-        {/* 6. GYE TV+ EN VIVO (Reproductor Live & Chat con sincronización inmediata) */}
-        <LivePlayer
-          onOpenWebmasterGuide={() => setIsWebmasterGuideOpen(true)}
-          onOpenAdmin={handleOpenAdmin}
-        />
+        {currentTab === 'programas' && (
+          <ShowsCatalogView onOpenLive={handleOpenLive} />
+        )}
 
-        {/* 7. Explora GYE TV+ (Categorías) */}
-        <CategorySection
-          onSelectCategory={(cat) => setSelectedCategory(cat)}
-        />
+        {currentTab === 'noticias' && (
+          <NewsCatalogView newsList={newsList} onSelectNews={(news) => setActiveNewsModal(news)} />
+        )}
 
-        {/* 8. Deportes GYE TV+ (Liga Pro, BSC, Emelec, IDV, La Tri) */}
-        <SportsSection
-          newsList={newsList}
-          onSelectNews={(news) => setActiveNewsModal(news)}
-        />
-
-        {/* 9. Entretenimiento (Música, Shows, Tendencias) */}
-        <EntertainmentSection
-          newsList={newsList}
-          onSelectNews={(news) => setActiveNewsModal(news)}
-        />
-
-        {/* 10. Redes Sociales (Síguenos) */}
-        <SocialSection />
-
-        {/* 13. Boletín / Newsletter (Recibe las Noticias) */}
-        <NewsletterSection />
-
+        {currentTab === 'videos' && (
+          <VideoLibraryView onOpenLive={handleOpenLive} />
+        )}
       </main>
 
-      {/* 14. Footer */}
+      {/* Footer */}
       <Footer
-        onSelectCategory={(cat) => setSelectedCategory(cat)}
+        onSelectCategory={(cat) => {
+          setSelectedCategory(cat);
+          setCurrentTab('noticias');
+        }}
         onOpenWebmasterGuide={() => setIsWebmasterGuideOpen(true)}
         onOpenContactModal={() => setIsContactOpen(true)}
         onOpenAdmin={handleOpenAdmin}
       />
 
-      {/* Modal 1: Article Reader Modal */}
+      {/* Bottom Navigation Bar for Mobile */}
+      <BottomNavBar
+        currentTab={currentTab}
+        onTabChange={(tab) => setCurrentTab(tab as any)}
+        onOpenLive={handleOpenLive}
+      />
+
+      {/* Modals */}
       <NewsModal
         news={activeNewsModal}
         onClose={() => setActiveNewsModal(null)}
@@ -156,7 +239,6 @@ function AppContent() {
         allNews={newsList}
       />
 
-      {/* Modal 2: Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
@@ -164,19 +246,16 @@ function AppContent() {
         onSelectNews={(news) => setActiveNewsModal(news)}
       />
 
-      {/* Modal 3: Contact & Citizen Report Modal */}
       <ContactModal
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
       />
 
-      {/* Modal 4: Webmaster Technical & Configuration Guide Modal */}
       <WebmasterGuideModal
         isOpen={isWebmasterGuideOpen}
         onClose={() => setIsWebmasterGuideOpen(false)}
       />
 
-      {/* Modal 5: Master Admin Modal (Real-time synchronization for admin guayaquiltv) */}
       <AdminModal
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}

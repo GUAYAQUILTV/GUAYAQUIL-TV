@@ -236,9 +236,11 @@ export const LIVE_STREAM_CONFIG: LiveStreamConfig = {
   currentShow: 'Guayaquil al Día con Valeria Solís & Carlos Mendoza',
   presenter: 'Valeria Solís & Carlos Mendoza',
   viewersCount: 4892,
-  streamSource: 'demo', // 'youtube' | 'custom' | 'demo'
-  youtubeEmbedId: 'live_stream', // Puedes reemplazar con tu ID de YouTube (ej. 'jfKfPfyJRdk')
-  customStreamUrl: '', // O tu URL HLS / MP4 directo
+  streamSource: 'demo', // 'youtube' | 'dailymotion' | 'image' | 'custom' | 'demo'
+  youtubeEmbedId: 'jfKfPfyJRdk',
+  dailymotionEmbedId: '',
+  customImageUrl: 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=1200&q=80',
+  customStreamUrl: '',
   schedule: [
     { time: '06:00 - 08:30', title: 'Amanecer Guayaco', host: 'Andrés Vera', category: 'Noticias & Tránsito' },
     { time: '08:30 - 11:00', title: 'Conexión Digital GYE', host: 'María Paz Jaramillo', category: 'Revista Matinal' },
