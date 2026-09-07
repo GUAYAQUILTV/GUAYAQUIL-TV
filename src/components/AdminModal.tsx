@@ -638,19 +638,22 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, initial
                         </div>
                       )}
 
-                      {/* Custom URL Input */}
+                       {/* Custom / Universal URL Input */}
                       {liveForm.streamSource === 'custom' && (
                         <div className="pt-3 border-t border-cyan-500/20">
                           <label className="block text-xs font-bold text-emerald-400 mb-1">
-                            URL directa de transmisión (.m3u8 / .mp4):
+                            URL Universal o Código Iframe / .mp4 / .m3u8:
                           </label>
                           <input
                             type="text"
                             value={liveForm.customStreamUrl}
                             onChange={(e) => setLiveForm(prev => ({ ...prev, customStreamUrl: e.target.value }))}
-                            placeholder="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                            placeholder="Pega cualquier enlace, iframe o .mp4 / .m3u8 aquí..."
                             className="w-full px-3 py-2 bg-[#080d1a] border border-emerald-500/50 text-sm text-white focus:outline-none focus:border-emerald-400"
                           />
+                          <p className="text-[11px] text-slate-400 mt-1 font-sans">
+                            Acepta enlaces de YouTube, Dailymotion, servidores HLS (.m3u8), archivos .mp4 o etiquetas &lt;iframe&gt; completas.
+                          </p>
                         </div>
                       )}
                     </div>

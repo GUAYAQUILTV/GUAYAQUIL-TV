@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { extractYouTubeId, extractDailymotionId } from '../utils/streamHelpers';
+import { extractYouTubeId, extractDailymotionId, parseUniversalStream } from '../utils/streamHelpers';
 import { 
   Play, 
   Pause, 
@@ -305,15 +305,57 @@ export const LivePlayer: React.FC<LivePlayerProps> = ({ onOpenWebmasterGuide, on
                       </div>
                     </div>
                   </div>
-                ) : liveConfig.streamSource === 'custom' && liveConfig.customStreamUrl ? (
-                  <video
-                    src={liveConfig.customStreamUrl}
-                    autoPlay
-                    muted={isMuted}
-                    controls={false}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
+                ) : liveConfig.streamSource === 'custom' && liveConfig.customStreamUrl ? (() => {
+                  const parsed = parseUniversalStream(liveConfig.customStreamUrl);
+                  if (parsed.type === 'youtube') {
+                    return (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${parsed.src}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1`}
+                        title="GYE TV+ Custom YouTube"
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    );
+                  } else if (parsed.type === 'dailymotion') {
+                    return (
+                      <iframe
+                        src={`https://www.dailymotion.com/embed/video/${parsed.src}?autoplay=1&mute=${isMuted ? 1 : 0}`}
+                        title="GYE TV+ Custom Dailymotion"
+                        className="w-full h-full border-0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                      />
+                    );
+                  } else if (parsed.type === 'iframe') {
+                    return (
+                      <iframe
+                        src={parsed.src}
+                        title="GYE TV+ Custom Embed"
+                        className="w-full h-full border-0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                      />
+                    );
+                  } else if (parsed.type === 'image') {
+                    return (
+                      <div className="relative w-full h-full">
+                        <img src={parsed.src} alt="GYE TV+ Custom Stream" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050811] via-black/30 to-transparent"></div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <video
+                        src={parsed.src}
+                        autoPlay
+                        muted={isMuted}
+                        controls={false}
+                        className="w-full h-full object-cover"
+                      />
+                    );
+                  }
+                })() : (
                   <div className="relative w-full h-full">
                     <img
                       src="https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=1400&q=85"

@@ -30,7 +30,7 @@ import { NewsItem, CategoryType } from './types';
 
 function AppContent() {
   const { newsList, adBanners } = useData();
-  const [currentTab, setCurrentTab] = useState<'inicio' | 'programacion' | 'programas' | 'noticias' | 'videos'>('inicio');
+  const [currentTab, setCurrentTab] = useState<'inicio' | 'noticias-deportes' | 'farandula' | 'programacion'>('inicio');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('Todas');
   const [activeNewsModal, setActiveNewsModal] = useState<NewsItem | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -90,25 +90,17 @@ function AppContent() {
           <div className="flex items-center gap-1">
             {[
               {id: 'inicio', label: '🏠 INICIO'},
-              {id: 'envivo', label: '🔴 EN VIVO', isLive: true},
+              {id: 'noticias-deportes', label: '📰 NOTICIAS & DEPORTES'},
+              {id: 'farandula', label: '🔥 FARÁNDULA EXCLUSIVAS'},
               {id: 'programacion', label: '📺 PROGRAMACIÓN'},
-              {id: 'programas', label: '🎬 PROGRAMAS'},
-              {id: 'noticias', label: '📰 NOTICIAS'},
-              {id: 'videos', label: '🎥 VIDEOS'},
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => {
-                  if (tab.id === 'envivo') {
-                    handleOpenLive();
-                  } else {
-                    setCurrentTab(tab.id as any);
-                  }
+                  setCurrentTab(tab.id as any);
                 }}
-                className={`px-3.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer border ${
-                  tab.id === 'envivo'
-                    ? 'bg-[#ff6600] text-black border-[#ff6600] shadow-[0_0_15px_rgba(255,102,0,0.6)] font-extrabold'
-                    : currentTab === tab.id
+                className={`px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer border ${
+                  currentTab === tab.id
                     ? 'bg-[#00f0ff] text-black border-[#00f0ff] shadow-[0_0_15px_rgba(0,240,255,0.6)]'
                     : 'bg-transparent text-slate-200 hover:text-[#00f0ff] hover:bg-cyan-950/40 border-transparent hover:border-cyan-500/30'
                 }`}
@@ -196,20 +188,54 @@ function AppContent() {
           </>
         )}
 
+        {currentTab === 'noticias-deportes' && (
+          <div className="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="border-b border-cyan-500/30 pb-4">
+              <span className="px-3 py-1 bg-[#00f0ff]/10 border border-[#00f0ff] text-[#00f0ff] font-mono text-xs uppercase tracking-widest">
+                COBERTURA INTEGRAL
+              </span>
+              <h2 className="text-3xl font-headline font-black text-white mt-2">
+                Noticias & Deportes • GYE TV+
+              </h2>
+              <p className="text-sm text-slate-300">
+                Información de última hora, crónica urbana, reportajes y el acontecer futbolístico y olímpico.
+              </p>
+            </div>
+            <NewsSection
+              newsList={newsList}
+              selectedCategory={selectedCategory}
+              onSelectCategory={(cat) => setSelectedCategory(cat)}
+              onSelectNews={(news) => setActiveNewsModal(news)}
+            />
+            <SportsSection
+              newsList={newsList}
+              onSelectNews={(news) => setActiveNewsModal(news)}
+            />
+          </div>
+        )}
+
+        {currentTab === 'farandula' && (
+          <div className="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="border-b border-purple-500/30 pb-4">
+              <span className="px-3 py-1 bg-purple-500/10 border border-purple-500 text-purple-300 font-mono text-xs uppercase tracking-widest">
+                EXCLUSIVAS DE ESPECTÁCULOS
+              </span>
+              <h2 className="text-3xl font-headline font-black text-white mt-2">
+                Farándula Exclusivas — ¡Sí pasa, se cuenta!
+              </h2>
+              <p className="text-sm text-slate-300">
+                Toda la verdad de la farándula nacional e internacional, entrevistas bomba y exclusivas de la pantalla porteña.
+              </p>
+            </div>
+            <EntertainmentSection
+              newsList={newsList}
+              onSelectNews={(news) => setActiveNewsModal(news)}
+            />
+          </div>
+        )}
+
         {currentTab === 'programacion' && (
           <ProgramScheduleView onOpenLive={handleOpenLive} />
-        )}
-
-        {currentTab === 'programas' && (
-          <ShowsCatalogView onOpenLive={handleOpenLive} />
-        )}
-
-        {currentTab === 'noticias' && (
-          <NewsCatalogView newsList={newsList} onSelectNews={(news) => setActiveNewsModal(news)} />
-        )}
-
-        {currentTab === 'videos' && (
-          <VideoLibraryView onOpenLive={handleOpenLive} />
         )}
       </main>
 
@@ -217,7 +243,7 @@ function AppContent() {
       <Footer
         onSelectCategory={(cat) => {
           setSelectedCategory(cat);
-          setCurrentTab('noticias');
+          setCurrentTab('noticias-deportes');
         }}
         onOpenWebmasterGuide={() => setIsWebmasterGuideOpen(true)}
         onOpenContactModal={() => setIsContactOpen(true)}
